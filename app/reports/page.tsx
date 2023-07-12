@@ -1,10 +1,25 @@
+import Link from "next/link";
+import PocketBase from "pocketbase";
+
+export const dynamic = "auto",
+  dynamicParams = true,
+  revalidate = 0,
+  fetchCache = "auto",
+  runtime = "nodejs",
+  preferredRegion = "auto";
+
 async function getReports() {
-  const res = await fetch(
-    "http://127.0.0.1:8090/api/collections/support/records?page=1&perPage=30",
-    { cache: "no-store" }
-  );
-  const data = await res.json();
-  return data?.items as any[];
+  // const res = await fetch('http://127.0.0.1:8090/api/collections/notes/records?page=1&perPage=30', { cache: 'no-store' });
+  // const data = await res.json();
+  // return data?.items as any[];
+
+  // Fetch data with Pocketbase
+  const pb = new PocketBase("http://127.0.0.1:8090");
+  const result = await pb
+    .collection("support")
+    .getList(1, 30, { cache: "no-store" });
+  const data = result.items;
+  return data as any[];
 }
 
 export default async function ReportsPage() {
@@ -38,7 +53,8 @@ export default async function ReportsPage() {
 }
 
 function Report({ report }: any) {
-  const { id, name, email, category, description, created } = report || {};
+  const { id, name, email, category, status, description, created } =
+    report || {};
 
   return (
     <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
@@ -54,21 +70,36 @@ function Report({ report }: any) {
       <td className="px-6 py-4">{category}</td>
       <td className="px-6 py-4">
         <div className="flex items-center">
-          <div className="h-2.5 w-2.5 rounded-full bg-yellow-500 mr-2"></div>{" "}
-          Pendente
+          <div
+            className={`${
+              status === "pending"
+                ? "badge-yellow"
+                : status === "solved"
+                ? "badge-green"
+                : status === "canceled"
+                ? "badge-red"
+                : status === "analyzing"
+                ? "badge-blue"
+                : "badge-gray"
+            }`}
+          >
+            {status === "pending"
+              ? "Pendente"
+              : status === "solved"
+              ? "Resolvido"
+              : status === "canceled"
+              ? "Cancelado"
+              : status === "analyzing"
+              ? "Analisando"
+              : "Não identificado"}
+          </div>
         </div>
       </td>
       <td className="px-6 py-4">
         {/* Modal toggle */}
-        <a
-          href="#"
-          type="button"
-          data-modal-target="editUserModal"
-          data-modal-show="editUserModal"
-          className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-        >
+        <Link href={`/reports/${id}`} className="btn btn-primary">
           Editar
-        </a>
+        </Link>
       </td>
     </tr>
   );
