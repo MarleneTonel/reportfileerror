@@ -1,20 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/router";
-import Label from "../../components/Label";
-import Input from "../../components/Input";
-import InputError from "../../components/InputError";
-import Card from "../../components/Card";
-import FileInput from "../../components/FileInput";
-import SelectInput from "../../components/SelectInput";
-import Textarea from "../../components/Textarea";
+import { useRouter } from "next/navigation";
+import Label from "../../../components/Label";
+import Input from "../../../components/Input";
+import InputError from "../../../components/InputError";
+import Card from "../../../components/Card";
+import FileInput from "../../../components/FileInput";
+import SelectInput from "../../../components/SelectInput";
+import Textarea from "../../../components/Textarea";
 
 export default function CreateReport() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [file, setFile] = useState("");
-  const [category, setCategory] = useState("");
+  const [file, setFile] = useState([]);
+  const [category, setCategory] = useState("Curso errado");
+  const [status, setStatus] = useState("pending");
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState([]);
 
@@ -31,6 +32,8 @@ export default function CreateReport() {
         email,
         category,
         description,
+        status,
+        // file,
       }),
     });
 
@@ -38,18 +41,20 @@ export default function CreateReport() {
     setEmail("");
     setCategory("");
     setDescription("");
+    setStatus("pending");
+    setFile([]);
 
-    router.refresh();
+    router.push("/success");
   };
 
   return (
-    <div className="h-[92vh] sm:h-[94vh] sm:flex sm:justify-center sm:items-center">
-      <Card>
-        <h3 className="text-lg font-semibold mb-4 text-center">
-          Notifique sobre um documento incorreto
-        </h3>
+    <form onSubmit={create} className="flex justify-center">
+      <div className="space-y-6 w-1/3">
+        <div className="border-b border-gray-900/10 dark:border-gray-200/10 pb-6">
+          <h3 className="text-lg font-semibold mb-4 text-center">
+            Notifique sobre um documento incorreto
+          </h3>
 
-        <form onSubmit={create}>
           {/* Nome */}
           <div>
             <Label htmlFor="name">Nome</Label>
@@ -67,7 +72,7 @@ export default function CreateReport() {
           </div>
 
           {/* Email */}
-          <div className="mt-4">
+          <div className="mt-6">
             <Label htmlFor="email">Email</Label>
 
             <Input
@@ -83,7 +88,7 @@ export default function CreateReport() {
           </div>
 
           {/* Escolher Arquivo */}
-          {/* <div className="mt-4">
+          {/* <div className="mt-6">
             <Label htmlFor="file">Escolher Arquivo</Label>
 
             <FileInput
@@ -98,7 +103,7 @@ export default function CreateReport() {
           </div> */}
 
           {/* Categoria */}
-          <div className="mt-4">
+          <div className="mt-6">
             <Label htmlFor="category">Categoria</Label>
 
             <SelectInput
@@ -108,19 +113,19 @@ export default function CreateReport() {
               onChange={(event) => setCategory(event.target.value)}
               required
             >
-              <option value="1">Curso errado</option>
-              <option value="2">Nome da mãe errado</option>
-              <option value="3">
+              <option value="Curso errado">Curso errado</option>
+              <option value="Nome da mãe errado">Nome da mãe errado</option>
+              <option value="Problemas de leitura do arquivo, preciso em RTF">
                 Problemas de leitura do arquivo, preciso em RTF
               </option>
-              <option value="4">CPF ou RG errado</option>
+              <option value="CPF ou RG errado">CPF ou RG errado</option>
             </SelectInput>
 
             <InputError messages={errors.category} className="mt-2" />
           </div>
 
           {/* Descrição */}
-          <div className="mt-4">
+          <div className="mt-6">
             <Label htmlFor="description">Descrição</Label>
 
             <Textarea
@@ -133,14 +138,15 @@ export default function CreateReport() {
 
             <InputError messages={errors.description} className="mt-2" />
           </div>
+        </div>
+          <button className="btn btn-primary" type="submit">
+            Enviar
+          </button>
 
-          <div className="flex justify-center mt-4">
-            <button className="w-full btn btn-primary" type="submit">
-              Enviar
-            </button>
-          </div>
-        </form>
-      </Card>
-    </div>
+          <a href="/" className="ml-2 btn btn-outline">
+            Voltar
+          </a>
+      </div>
+    </form>
   );
 }
