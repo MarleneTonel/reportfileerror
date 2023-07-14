@@ -1,5 +1,5 @@
+import moment from "moment";
 import Card from "../../../components/Card";
-import Label from "../../../components/Label";
 import PocketBase from "pocketbase";
 
 async function getReport(reportId: string) {
@@ -56,40 +56,40 @@ export default async function ReportPage({ params }: any) {
           </div>
 
           <small className="font-normal text-gray-500">
-            Criado em: {report.created}
+            Criado em: {moment(report.created).format("DD/MM/YYYY, h:mm:ss")}
           </small>
         </div>
 
         <div className="mb-4">
-          <label className="block font-medium text-sm text-gray-500">
-            Nome
-          </label>
+          <label className="label">Nome</label>
           <p>{report.name}</p>
         </div>
 
         <div className="mb-4">
-          <label className="block font-medium text-sm text-gray-500">
-            Email
-          </label>
+          <label className="label">Email</label>
           <p>{report.email}</p>
         </div>
 
         <div className="mb-4">
-          <label className="block font-medium text-sm text-gray-500">
-            Arquivo
-          </label>
+          <label className="label">Arquivo</label>
           {report.file ? <p>{report.file}</p> : <p>Sem arquivo</p>}
         </div>
 
-        <div className="mb-4">
-          <label className="block font-medium text-sm text-gray-500">
-            Descrição
-          </label>
+        <div className="mb-6">
+          <label className="label">Descrição</label>
           <p>{report.description}</p>
         </div>
 
-        <div>
-          <button className="btn btn-danger">Cancelar</button>
+        <div className="flex justify-between">
+          <a href="/reports" className="btn btn-outline">
+            Voltar
+          </a>
+
+          <div>
+            <button className="btn btn-danger mr-2">Negar</button>
+            <button className="btn btn-warning mr-2">Deixar em analise</button>
+            <button className="btn btn-success">Resolvido</button>
+          </div>
         </div>
       </Card>
     </div>

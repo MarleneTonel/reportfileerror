@@ -1,20 +1,27 @@
 "use client";
 
-// import { useAuth } from "@/hooks/auth";
+import PocketBase from "pocketbase";
 import Link from "next/link";
 import React, { useState } from "react";
 import "../styles/globals.css";
 import Bars3Icon from "@heroicons/react/24/solid/Bars3Icon";
 import XMarkIcon from "@heroicons/react/24/solid/XMarkIcon";
 import { Dialog } from "@headlessui/react";
+import { useRouter } from "next/navigation";
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
-  // const { user } = useAuth({ middleware: "guest" });
+}: React.PropsWithChildren<unknown>) {
+  const pb = new PocketBase("http://127.0.0.1:8090");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
+
+  console.log(pb.authStore.isValid);
+
+  function logout() {
+    pb.authStore.clear();
+    router.refresh();
+  }
 
   return (
     <html>
@@ -33,7 +40,7 @@ export default function RootLayout({
               <div className="flex lg:hidden">
                 <button
                   type="button"
-                  className="-m-2.5 inline-flex items-center justify-center rounded-md px-4 sm:px-6 lg:px-8 text-gray-700 dark:text-gray-200"
+                  className="inline-flex items-center justify-center rounded-md px-4 sm:px-6 lg:px-8 text-gray-700 dark:text-gray-200"
                   onClick={() => setMobileMenuOpen(true)}
                 >
                   <span className="sr-only">Open main menu</span>
@@ -41,17 +48,24 @@ export default function RootLayout({
                 </button>
               </div>
               <div className="hidden lg:flex lg:gap-x-12">
-                <Link
-                  href="/reports"
-                  className="btn hover:bg-gray-200 dark:hover:bg-gray-700"
-                >
-                  Relatórios
-                </Link>
+                {pb.authStore.isValid ? (
+                  <Link href="/reports" className="btn">
+                    Relatórios
+                  </Link>
+                ) : (
+                  <></>
+                )}
               </div>
               <div className="hidden lg:flex lg:flex-1 lg:justify-end px-4 sm:px-6 lg:px-8">
-                <Link href="/login" className="btn btn-primary">
-                  Entrar
-                </Link>
+                {pb.authStore.isValid ? (
+                  <button onClick={logout} className="btn">
+                    Sair
+                  </button>
+                ) : (
+                  <Link href="/login" className="btn btn-primary">
+                    Entrar
+                  </Link>
+                )}
               </div>
             </nav>
 
@@ -76,21 +90,28 @@ export default function RootLayout({
                   </button>
                 </div>
                 <div className="mt-6 flow-root">
-                  <div className="-my-6 divide-y divide-gray-500/10">
-                    <div className="space-y-2 py-6">
-                      <Link
-                        href="/reports"
-                        className="btn text-base hover:bg-gray-200 dark:hover:bg-gray-700"
-                      >
-                        Relatórios
-                      </Link>
+                  {pb.authStore.isValid ? (
+                    <div className="-my-6 divide-y divide-gray-500/10">
+                      <div className="space-y-2 py-6">
+                        <Link href="/reports" className="btn text-base">
+                          Relatórios
+                        </Link>
+                      </div>
+                      <div className="py-6">
+                        <button onClick={logout} className="btn">
+                          Sair
+                        </button>
+                      </div>
                     </div>
-                    <div className="py-6">
-                      <Link href="/login" className="btn btn-primary">
-                        Entrar
-                      </Link>
+                  ) : (
+                    <div className="-my-6 divide-y divide-gray-500/10">
+                      <div className="py-6">
+                        <Link href="/login" className="btn">
+                          Entrar
+                        </Link>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </Dialog.Panel>
             </Dialog>
