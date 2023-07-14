@@ -10,3 +10,4 @@
 3. Execute Pocketbase com o comando
 `./pocketbase serve`
 4. Abre o [Admin UI](http://127.0.0.1:8090/_/), crie uma collection, vá na engrenagem que se encontra no topo e ao lado do nome da collection, em seguida no "API RULES" e atualize todas as regras de segurança para "allow read/write access".
+5. Execute o comando `npm run dev`.
