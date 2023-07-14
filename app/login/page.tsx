@@ -1,62 +1,37 @@
 "use client";
 
+import { useEffect } from "react";
 import PocketBase from "pocketbase";
 import Card from "../../components/Card";
 import Label from "../../components/Label";
 import Link from "next/link";
 import Head from "next/head";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 export default function AuthLogin() {
   const pb = new PocketBase("http://127.0.0.1:8090");
-  // const { query } = useRouter();
-
-  // const { login } = useAuth({
-  //     middleware: "guest",
-  //     redirectIfAuthenticated: "/dashboard",
-  // });
-
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
-  // const [shouldRemember, setShouldRemember] = useState(false);
-  // const [errors, setErrors] = useState([]);
-  // const [status, setStatus] = useState<string | null>(null);
-
-  // useEffect(() => {
-  //     const reset = query && query.reset ? (query.reset as string) : "";
-  //     if (reset.length > 0 && errors.length === 0) {
-  //         setStatus(atob(reset));
-  //     } else {
-  //         setStatus(null);
-  //     }
-  // });
-
-  // const submitForm: FormEventHandler = async (event) => {
-  //     event.preventDefault();
-
-  //     login({
-  //         email,
-  //         password,
-  //         remember: shouldRemember,
-  //         setErrors,
-  //         setStatus,
-  //     });
-  // };
+  const router = useRouter();
 
   const { register, handleSubmit } = useForm();
 
-  async function login(data) {
+  useEffect(() => {
+    if (pb.authStore.isValid) {
+      router.push("/");
+    }
+  }, []);
+
+  const login = async (data) => {
     try {
-      const authData = await pb
-        .collection("users")
-        .authWithPassword(data.email, data.password);
+      await pb.collection("users").authWithPassword(data.email, data.password);
+      window.location.reload();
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen sm:flex sm:justify-center items-center">
+    <div className="md:mt-20 sm:flex sm:justify-center items-center">
       <Head>
         <title>iDocumentos - Login</title>
       </Head>
@@ -120,14 +95,8 @@ export default function AuthLogin() {
                             </Link>
                         </div> */}
 
-          <div className="flex items-center justify-evenly mt-4">
-            <Link
-              href="/"
-              className="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-            >
-              Voltar
-            </Link>
-            <button className="btn btn-primary" type="submit">
+          <div className="flex justify-center mt-4">
+            <button className="btn btn-primary w-full" type="submit">
               Entrar
             </button>
           </div>

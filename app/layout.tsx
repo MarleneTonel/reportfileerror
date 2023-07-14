@@ -2,25 +2,35 @@
 
 import PocketBase from "pocketbase";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import "../styles/globals.css";
 import Bars3Icon from "@heroicons/react/24/solid/Bars3Icon";
 import XMarkIcon from "@heroicons/react/24/solid/XMarkIcon";
 import { Dialog } from "@headlessui/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function RootLayout({
   children,
-}: React.PropsWithChildren<unknown>) {
+}: {
+  children: React.ReactNode;
+}) {
   const pb = new PocketBase("http://127.0.0.1:8090");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setIsClient] = useState(false);
   const router = useRouter();
+  const pathName = usePathname();
 
-  console.log(pb.authStore.isValid);
+  useEffect(() => {
+    setIsClient(pb.authStore.isValid);
+    
+    if(!pb.authStore.isValid && pathName === "/reports") {
+      router.push("/");
+    }
+  }, []);
 
   function logout() {
     pb.authStore.clear();
-    router.refresh();
+    window.location.reload();
   }
 
   return (
@@ -48,7 +58,7 @@ export default function RootLayout({
                 </button>
               </div>
               <div className="hidden lg:flex lg:gap-x-12">
-                {pb.authStore.isValid ? (
+                {user ? (
                   <Link href="/reports" className="btn">
                     Relatórios
                   </Link>
@@ -57,7 +67,7 @@ export default function RootLayout({
                 )}
               </div>
               <div className="hidden lg:flex lg:flex-1 lg:justify-end px-4 sm:px-6 lg:px-8">
-                {pb.authStore.isValid ? (
+                {user ? (
                   <button onClick={logout} className="btn">
                     Sair
                   </button>
